@@ -18,12 +18,14 @@ persistence.
 > The hostname is inherited from an earlier project on the same free-tier
 > account — the app it serves is this one.
 
-## ⚠️ Before you submit this — two things need your action
+## 🎥 Walkthrough video
 
-1. **Record the walkthrough video** and put the link in `VIDEO.txt`. A captioned
-   screen recording of every feature is at `demo/ajaia-demo-full.webm`, with a
-   narration script in [docs/WALKTHROUGH_SCRIPT.md](./docs/WALKTHROUGH_SCRIPT.md).
-2. **Read [AI_WORKFLOW.md](./AI_WORKFLOW.md) and confirm it matches your account
+**https://youtu.be/qyioRI18x8U** — 4:47, captioned, covering every feature end
+to end including a real concurrent-edit conflict and read-only enforcement.
+
+## ⚠️ Before you submit this — one thing needs your action
+
+1. **Read [AI_WORKFLOW.md](./AI_WORKFLOW.md) and confirm it matches your account
    of how this was built.** It describes a paired effort with Claude Code across
    the code and the API layer, with the scoping, architecture and verification on
    your side. Reviewers will ask about specifics in the interview, so make sure

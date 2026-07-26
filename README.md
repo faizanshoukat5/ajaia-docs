@@ -2,6 +2,7 @@
 
 **▶ Live: https://ai-symptom-analyzer-production.up.railway.app** — sign in with
 one click as any of the three demo accounts.
+**🎥 Walkthrough: https://youtu.be/qyioRI18x8U** (4:47, captioned)
 
 A lightweight collaborative document editor — rich-text editing, file import, and
 role-based sharing, built as a single Next.js application.

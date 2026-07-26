@@ -1,24 +1,16 @@
 WALKTHROUGH VIDEO
 =================
 
-STATUS: NOT YET RECORDED  --  replace this file's contents before submitting.
+Video URL: https://youtu.be/qyioRI18x8U
 
-Video URL: <PASTE YOUR UNLISTED LOOM / YOUTUBE / VIMEO LINK HERE>
+A 4:47 walkthrough of every feature, with subtitle captions explaining each
+step as it happens. Chapters and the full description are in
+docs/VIDEO_DESCRIPTION.md; the narration script is in
+docs/WALKTHROUGH_SCRIPT.md.
 
-A shot-by-shot script for the 3-5 minute walkthrough, keyed to the actual UI,
-is in docs/WALKTHROUGH_SCRIPT.md. It covers everything the brief asks for:
-
-  - the main user flow
-  - what works end to end
-  - what was intentionally deprioritized
-  - key implementation decisions
-  - how AI supported the workflow
-
-Before recording:
-
-  npm run db:reset && npm run setup
-  npm run dev
-
-Open two browser profiles (or one normal + one incognito) so you can be Ada and
-Alan at the same time. The side-by-side owner/viewer comparison is the most
-persuasive part of the demo.
+Covered, in order: sign-in, the owned/shared document list, search, document
+creation, inline rename, autosave states, rich-text formatting, the link
+dialog, undo history and word count, file import (append/replace and
+create-new), an unsupported-file rejection, presence with a second user, a
+real concurrent-edit conflict and its recovery through version history,
+sharing roles, dark mode, and read-only enforcement for a viewer.

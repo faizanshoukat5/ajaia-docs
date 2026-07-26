@@ -3,7 +3,7 @@
 # Ajaia Docs — Full Stack Product Engineer take-home
 
 **Live app:** https://ai-symptom-analyzer-production.up.railway.app
-**Walkthrough video:** [PASTE VIDEO URL]
+**Walkthrough video:** https://youtu.be/qyioRI18x8U
 **Google Drive folder:** [PASTE DRIVE FOLDER URL]
 
 **Stack:** Next.js 16 (App Router) · React 19 · TypeScript · TipTap 3 (ProseMirror) · SQLite + Drizzle · Tailwind 4 · Vitest
