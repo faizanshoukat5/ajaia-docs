@@ -10,6 +10,12 @@
 # Postgres and Redis images use, and it keeps the runtime process non-root.
 set -e
 
+# Next.js' standalone server binds to $HOSTNAME, and Docker sets that to the
+# container ID — so the server would listen only on the container's own address
+# and the platform's router would get connection refused (502). Bind to all
+# interfaces instead.
+export HOSTNAME=0.0.0.0
+
 DB_DIR=$(dirname "${DATABASE_PATH:-/data/ajaia.db}")
 mkdir -p "$DB_DIR"
 
