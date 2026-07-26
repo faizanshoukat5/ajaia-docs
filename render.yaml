@@ -1,29 +1,34 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 #
-# Deploys as a plain Node service (no Docker). A persistent disk is attached so
-# the SQLite database survives restarts and redeploys.
+# Configured for Render's FREE tier so reviewers never need a paid service.
 #
-# NOTE ON FREE TIER: persistent disks are a paid feature on Render. On the free
-# plan, remove the `disk:` block below — the app still runs and re-seeds itself
-# on each cold start (see src/instrumentation.ts), but user-created documents do
-# not survive a restart, and idle services spin down (~1 min cold start). See
-# docs/DEPLOYMENT.md for the full comparison of hosting options.
+# Two consequences of `plan: free`, both deliberate and documented:
+#
+#   1. No persistent disk. Free services cannot attach one, so the SQLite file
+#      lives on an ephemeral filesystem. The app migrates and seeds itself on
+#      boot (src/instrumentation.ts), so the demo accounts and seed documents
+#      are always present — but documents a reviewer creates do not survive a
+#      restart or a spin-down.
+#   2. Idle spin-down after ~15 minutes, so the first request afterwards takes
+#      up to a minute.
+#
+# For persistence on Render, switch `plan` to `starter` and re-add:
+#   disk:
+#     name: ajaia-data
+#     mountPath: /var/data
+#     sizeGB: 1
+# plus DATABASE_PATH=/var/data/ajaia.db. See docs/DEPLOYMENT.md for the full
+# comparison against Railway and Fly.
 services:
   - type: web
     name: ajaia-docs
     runtime: node
-    plan: starter
+    plan: free
     buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /login
     envVars:
       - key: SESSION_SECRET
         generateValue: true
-      - key: DATABASE_PATH
-        value: /var/data/ajaia.db
       - key: NODE_VERSION
         value: "24"
-    disk:
-      name: ajaia-data
-      mountPath: /var/data
-      sizeGB: 1
