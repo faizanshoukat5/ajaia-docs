@@ -1,9 +1,31 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { DocumentEditor } from "@/components/DocumentEditor";
 import { getDb } from "@/db/client";
 import { AppError } from "@/lib/errors";
 import { loadDocumentForUser } from "@/server/documents";
 import { getCurrentUser } from "@/server/session";
+
+/**
+ * Per-document page title — shown in the tab, the browser's print header, and as
+ * the default filename of a saved PDF. Runs the same access check as the page so
+ * an unauthorized caller learns nothing from the title either.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const user = await getCurrentUser();
+  if (!user) return {};
+  const { id } = await params;
+  try {
+    const { doc } = loadDocumentForUser(getDb(), id, user.id);
+    return { title: doc.title };
+  } catch {
+    return {};
+  }
+}
 
 /**
  * The editor route. Authorization happens here, on the server, before any content

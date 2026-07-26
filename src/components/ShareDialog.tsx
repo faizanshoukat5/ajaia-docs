@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Crown, Trash2 } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { SHARE_ROLES, type ShareRole } from "@/lib/permissions";
 import { avatarColor, initials } from "@/lib/time";
@@ -130,9 +130,7 @@ export function ShareDialog({
     >
       <form onSubmit={grant} className="flex flex-wrap items-end gap-2">
         <label className="min-w-0 flex-1">
-          <span className="mb-1 block text-xs font-medium text-[var(--color-muted)]">
-            Email address
-          </span>
+          <span className="mb-1.5 block text-xs font-medium text-ink-2">Email address</span>
           <input
             type="email"
             required
@@ -140,7 +138,7 @@ export function ShareDialog({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="grace@ajaia.test"
-            className="w-full rounded-lg border border-[var(--color-line)] px-3 py-2 text-sm outline-none transition focus:border-[var(--color-accent)]"
+            className="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm outline-none transition placeholder:text-faint focus:border-accent focus:ring-2 focus:ring-accent-ring"
           />
           <datalist id="share-suggestions">
             {suggestions.map((user) => (
@@ -152,11 +150,11 @@ export function ShareDialog({
         </label>
 
         <label>
-          <span className="mb-1 block text-xs font-medium text-[var(--color-muted)]">Access</span>
+          <span className="mb-1.5 block text-xs font-medium text-ink-2">Access</span>
           <select
             value={role}
             onChange={(event) => setRole(event.target.value as ShareRole)}
-            className="rounded-lg border border-[var(--color-line)] bg-white px-2 py-2 text-sm outline-none focus:border-[var(--color-accent)]"
+            className="rounded-xl border border-line bg-surface px-2.5 py-2 text-sm outline-none transition focus:border-accent"
           >
             {SHARE_ROLES.map((r) => (
               <option key={r} value={r}>
@@ -169,28 +167,34 @@ export function ShareDialog({
         <button
           type="submit"
           disabled={busy}
-          className="rounded-lg bg-[var(--color-accent)] px-3 py-2 text-sm font-medium text-white transition hover:brightness-95 disabled:opacity-50"
+          className="rounded-xl bg-accent px-3.5 py-2 text-sm font-medium text-on-accent shadow-sm transition hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50"
         >
           {busy ? "Sharing…" : "Share"}
         </button>
       </form>
 
       {error && (
-        <p role="alert" className="mt-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p
+          role="alert"
+          className="mt-3 rounded-lg border border-danger/20 bg-danger-soft px-3 py-2 text-xs text-danger"
+        >
           {error}
         </p>
       )}
 
       <div className="mt-5">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+        <h3 className="text-[11px] font-semibold uppercase tracking-wider text-faint">
           Who has access
         </h3>
-        <ul className="mt-2 divide-y divide-[var(--color-line)]">
+        <ul className="mt-2 divide-y divide-line">
           <li className="flex items-center gap-3 py-2.5">
             <Avatar seed={ownerName} name={ownerName} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-medium">{ownerName}</span>
-              <span className="block text-xs text-[var(--color-muted)]">Owner</span>
+              <span className="flex items-center gap-1 text-xs text-muted">
+                <Crown size={11} className="text-warning" aria-hidden="true" />
+                Owner
+              </span>
             </span>
           </li>
 
@@ -199,15 +203,13 @@ export function ShareDialog({
               <Avatar seed={share.userId} name={share.name} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{share.name}</span>
-                <span className="block truncate text-xs text-[var(--color-muted)]">
-                  {share.email}
-                </span>
+                <span className="block truncate text-xs text-muted">{share.email}</span>
               </span>
               <select
                 value={share.role}
                 aria-label={`Access level for ${share.name}`}
                 onChange={(event) => void changeRole(share.userId, event.target.value as ShareRole)}
-                className="rounded-md border border-[var(--color-line)] bg-white px-2 py-1 text-xs outline-none focus:border-[var(--color-accent)]"
+                className="rounded-lg border border-line bg-surface px-2 py-1 text-xs outline-none transition focus:border-accent"
               >
                 {SHARE_ROLES.map((r) => (
                   <option key={r} value={r}>
@@ -220,7 +222,7 @@ export function ShareDialog({
                 onClick={() => void revoke(share.userId)}
                 aria-label={`Remove ${share.name}`}
                 title={`Remove ${share.name}`}
-                className="rounded-md p-1.5 text-[var(--color-muted)] transition hover:bg-red-50 hover:text-red-600"
+                className="rounded-lg p-1.5 text-muted transition hover:bg-danger-soft hover:text-danger"
               >
                 <Trash2 size={14} aria-hidden="true" />
               </button>
@@ -228,9 +230,7 @@ export function ShareDialog({
           ))}
 
           {shares.length === 0 && (
-            <li className="py-3 text-xs text-[var(--color-muted)]">
-              Only you can see this document.
-            </li>
+            <li className="py-3 text-xs text-muted">Only you can see this document.</li>
           )}
         </ul>
       </div>
@@ -242,7 +242,7 @@ function Avatar({ seed, name }: { seed: string; name: string }) {
   return (
     <span
       aria-hidden="true"
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white shadow-sm"
       style={{ backgroundColor: avatarColor(seed) }}
     >
       {initials(name)}

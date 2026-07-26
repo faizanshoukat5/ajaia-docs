@@ -11,6 +11,7 @@ import {
   Check,
   CloudOff,
   Download,
+  Eye,
   History,
   Loader2,
   Trash2,
@@ -70,10 +71,14 @@ export function DocumentEditor({
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  // A picked file awaiting the append/replace decision in a dialog.
+  const [pendingImport, setPendingImport] = useState<File | null>(null);
+  const [wordStats, setWordStats] = useState<{ words: number; chars: number } | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const save = useAutosave(initialDocument.id, initialDocument.revision);
+  // Viewers get an inert hook: nothing queues, nothing flushes, no phantom saves.
+  const save = useAutosave(initialDocument.id, initialDocument.revision, canEdit);
 
   const editor = useEditor({
     // Required with the App Router: rendering the editor during SSR would produce
@@ -102,9 +107,28 @@ export function DocumentEditor({
       },
     },
     onUpdate({ editor: instance }) {
-      save.queue({ contentHtml: instance.getHTML() });
+      // Guarded by role: a read-only view must never turn a DOM mutation (browser
+      // extensions can cause one) into a save attempt.
+      if (canEdit) save.queue({ contentHtml: instance.getHTML() });
     },
   });
+
+  // Live word/character count, recomputed on every content change.
+  useEffect(() => {
+    if (!editor) return;
+    const compute = () => {
+      const text = editor.getText();
+      setWordStats({
+        words: text.split(/\s+/).filter(Boolean).length,
+        chars: text.replace(/\s/g, "").length,
+      });
+    };
+    compute();
+    editor.on("update", compute);
+    return () => {
+      editor.off("update", compute);
+    };
+  }, [editor]);
 
   // Keep the read-only state in sync if the role ever changes under us.
   useEffect(() => {
@@ -189,7 +213,7 @@ export function DocumentEditor({
           <a
             href="/documents"
             aria-label="Back to documents"
-            className="shrink-0 rounded-md p-1.5 text-[var(--color-muted)] transition hover:bg-[var(--color-canvas)]"
+            className="shrink-0 rounded-lg p-1.5 text-muted transition hover:bg-surface-2 hover:text-ink"
           >
             <ArrowLeft size={16} aria-hidden="true" />
           </a>
@@ -203,7 +227,7 @@ export function DocumentEditor({
             }}
             readOnly={!canEdit}
             aria-label="Document title"
-            className="min-w-0 flex-1 truncate rounded-md border border-transparent px-2 py-1 text-sm font-medium outline-none transition hover:border-[var(--color-line)] focus:border-[var(--color-accent)] read-only:hover:border-transparent"
+            className="min-w-0 flex-1 truncate rounded-lg border border-transparent px-2 py-1 text-sm font-medium outline-none transition hover:border-line focus:border-accent focus:ring-2 focus:ring-accent-ring read-only:hover:border-transparent"
           />
 
           <SaveIndicator
@@ -216,9 +240,18 @@ export function DocumentEditor({
       </AppHeader>
 
       <main className="mx-auto max-w-4xl px-4 py-6">
-        <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-[var(--color-muted)] ring-1 ring-[var(--color-line)]">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                isOwner
+                  ? "bg-accent-soft text-accent"
+                  : role === "editor"
+                    ? "bg-success-soft text-success"
+                    : "bg-surface-2 text-muted ring-1 ring-line"
+              }`}
+            >
+              {!canEdit && <Eye size={11} aria-hidden="true" />}
               {roleLabel(role)}
               {!isOwner && ` · ${owner.name}`}
             </span>
@@ -234,11 +267,9 @@ export function DocumentEditor({
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 event.target.value = "";
-                if (!file) return;
-                const replace = window.confirm(
-                  `Import "${file.name}".\n\nOK — replace everything in this document.\nCancel — add it to the end instead.`,
-                );
-                void importIntoDocument(file, replace ? "replace" : "append");
+                // The append/replace choice happens in a proper dialog, not a
+                // window.confirm whose OK/Cancel labels can't say what they do.
+                if (file) setPendingImport(file);
               }}
             />
 
@@ -284,7 +315,8 @@ export function DocumentEditor({
         </div>
 
         {!canEdit && (
-          <p className="no-print mb-3 rounded-lg bg-[var(--color-accent-soft)] px-3 py-2 text-xs text-[#174ea6]">
+          <p className="no-print mb-3 flex items-center gap-2 rounded-xl border border-accent-ring bg-accent-soft px-3.5 py-2.5 text-xs text-accent">
+            <Eye size={13} className="shrink-0" aria-hidden="true" />
             You have view-only access to this document. {owner.name} can give you edit access.
           </p>
         )}
@@ -295,7 +327,7 @@ export function DocumentEditor({
             document while you were writing. Your version is what is saved now — theirs is kept in{" "}
             <button
               type="button"
-              className="underline"
+              className="underline underline-offset-2"
               onClick={() => {
                 save.dismissConcurrentEdit();
                 setHistoryOpen(true);
@@ -310,7 +342,11 @@ export function DocumentEditor({
         {save.status === "error" && save.error && (
           <Banner tone="error">
             {save.error}{" "}
-            <button type="button" className="underline" onClick={() => void save.flush()}>
+            <button
+              type="button"
+              className="underline underline-offset-2"
+              onClick={() => void save.flush()}
+            >
               Retry now
             </button>
           </Banner>
@@ -333,9 +369,10 @@ export function DocumentEditor({
           </Banner>
         )}
 
-        <div className="doc-page overflow-hidden rounded-xl border border-[var(--color-line)] bg-white shadow-sm">
+        {/* No overflow-hidden here: it would break the toolbar's position:sticky. */}
+        <div className="doc-page rounded-2xl border border-line bg-surface shadow-sm">
           {canEdit && editor && <EditorToolbar editor={editor} />}
-          <div className="px-6 py-8 sm:px-12 sm:py-10">
+          <div className="px-6 py-8 sm:px-14 sm:py-12">
             {editor ? (
               <EditorContent editor={editor} />
             ) : (
@@ -349,9 +386,18 @@ export function DocumentEditor({
           </div>
         </div>
 
-        <p className="no-print mt-3 text-center text-[11px] text-[var(--color-muted)]">
-          Changes save automatically. Supported imports: {SUPPORTED_IMPORT_EXTENSIONS.join(", ")}.
-        </p>
+        <div className="no-print mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] text-faint">
+          <span>
+            {wordStats
+              ? `${wordStats.words.toLocaleString()} ${wordStats.words === 1 ? "word" : "words"} · ${wordStats.chars.toLocaleString()} characters · ~${Math.max(1, Math.round(wordStats.words / 200))} min read`
+              : " "}
+          </span>
+          <span>
+            {canEdit
+              ? `Changes save automatically. Imports: ${SUPPORTED_IMPORT_EXTENSIONS.join(", ")}.`
+              : "Read-only view."}
+          </span>
+        </div>
       </main>
 
       <ShareDialog
@@ -376,6 +422,45 @@ export function DocumentEditor({
       />
 
       <Modal
+        open={pendingImport !== null}
+        onClose={() => setPendingImport(null)}
+        title={pendingImport ? `Import “${pendingImport.name}”` : "Import"}
+        description="Add the file's content to the end of this document, or replace everything that is here now. A snapshot of the current content is kept in version history either way."
+      >
+        <div className="flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => setPendingImport(null)}
+            className="rounded-xl border border-line px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const file = pendingImport;
+              setPendingImport(null);
+              if (file) void importIntoDocument(file, "append");
+            }}
+            className="rounded-xl border border-line px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
+          >
+            Add to end
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const file = pendingImport;
+              setPendingImport(null);
+              if (file) void importIntoDocument(file, "replace");
+            }}
+            className="rounded-xl bg-accent px-3.5 py-2 text-sm font-medium text-on-accent shadow-sm transition hover:bg-accent-hover"
+          >
+            Replace document
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         title="Delete this document?"
@@ -385,14 +470,14 @@ export function DocumentEditor({
           <button
             type="button"
             onClick={() => setDeleteOpen(false)}
-            className="rounded-lg border border-[var(--color-line)] px-3 py-2 text-sm font-medium transition hover:bg-[var(--color-canvas)]"
+            className="rounded-xl border border-line px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
           >
             Keep it
           </button>
           <button
             type="button"
             onClick={() => void deleteDocument()}
-            className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+            className="rounded-xl bg-danger px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-danger-hover"
           >
             Delete permanently
           </button>
@@ -415,34 +500,39 @@ function SaveIndicator({
 }) {
   if (!canEdit) return null;
 
-  const base = "flex shrink-0 items-center gap-1.5 text-[11px]";
+  const base =
+    "flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium";
 
   if (status === "saving") {
     return (
-      <span className={`${base} text-[var(--color-muted)]`} aria-live="polite">
-        <Loader2 size={12} className="animate-spin" aria-hidden="true" />
+      <span className={`${base} bg-surface-2 text-muted`} aria-live="polite">
+        <Loader2 size={11} className="animate-spin" aria-hidden="true" />
         <span className="hidden sm:inline">Saving…</span>
       </span>
     );
   }
   if (status === "dirty") {
     return (
-      <span className={`${base} text-[var(--color-muted)]`}>
+      <span className={`${base} bg-warning-soft text-warning`}>
+        <span
+          aria-hidden="true"
+          className="h-1.5 w-1.5 rounded-full bg-current"
+        />
         <span className="hidden sm:inline">Unsaved changes</span>
       </span>
     );
   }
   if (status === "error") {
     return (
-      <span className={`${base} text-red-600`} aria-live="polite">
-        <CloudOff size={12} aria-hidden="true" />
+      <span className={`${base} bg-danger-soft text-danger`} aria-live="polite">
+        <CloudOff size={11} aria-hidden="true" />
         <span className="hidden sm:inline">Not saved</span>
       </span>
     );
   }
   return (
-    <span className={`${base} text-[var(--color-muted)]`} aria-live="polite">
-      <Check size={12} aria-hidden="true" />
+    <span className={`${base} bg-success-soft text-success`} aria-live="polite">
+      <Check size={11} aria-hidden="true" />
       <span className="hidden sm:inline">Saved {relativeTime(lastSavedAt, now)}</span>
     </span>
   );
@@ -467,7 +557,7 @@ function ExportMenu({ documentId }: { documentId: string }) {
             aria-hidden="true"
             onClick={() => setOpen(false)}
           />
-          <span className="absolute right-0 top-full z-20 mt-1 block w-40 overflow-hidden rounded-lg border border-[var(--color-line)] bg-white py-1 shadow-lg">
+          <span className="animate-pop-in absolute right-0 top-full z-20 mt-1.5 block w-44 overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-lg">
             {(
               [
                 ["md", "Markdown (.md)"],
@@ -479,18 +569,19 @@ function ExportMenu({ documentId }: { documentId: string }) {
                 key={format}
                 href={`/api/documents/${documentId}/export?format=${format}`}
                 onClick={() => setOpen(false)}
-                className="block px-3 py-1.5 text-xs transition hover:bg-[var(--color-canvas)]"
+                className="block px-3.5 py-2 text-xs font-medium text-ink-2 transition hover:bg-surface-2 hover:text-ink"
               >
                 {label}
               </a>
             ))}
+            <span aria-hidden="true" className="my-1 block h-px bg-line" />
             <button
               type="button"
               onClick={() => {
                 setOpen(false);
                 window.print();
               }}
-              className="block w-full px-3 py-1.5 text-left text-xs transition hover:bg-[var(--color-canvas)]"
+              className="block w-full px-3.5 py-2 text-left text-xs font-medium text-ink-2 transition hover:bg-surface-2 hover:text-ink"
             >
               Print / PDF
             </button>
@@ -517,17 +608,17 @@ function ToolbarAction({
   danger?: boolean;
 }) {
   const tone = primary
-    ? "bg-[var(--color-accent)] text-white border-transparent hover:brightness-95"
+    ? "bg-accent text-on-accent border-transparent shadow-sm hover:bg-accent-hover"
     : danger
-      ? "bg-white text-red-600 border-[var(--color-line)] hover:bg-red-50"
-      : "bg-white text-[var(--color-ink)] border-[var(--color-line)] hover:bg-[var(--color-canvas)]";
+      ? "bg-surface text-danger border-line hover:border-danger/30 hover:bg-danger-soft"
+      : "bg-surface text-ink-2 border-line shadow-xs hover:border-line-strong hover:bg-surface-2 hover:text-ink";
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition disabled:opacity-50 ${tone}`}
+      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition active:scale-[0.97] disabled:opacity-50 ${tone}`}
     >
       {icon}
       {children}
@@ -545,12 +636,14 @@ function Banner({
   onDismiss?: () => void;
 }) {
   const styles =
-    tone === "error" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-900";
+    tone === "error"
+      ? "border-danger/20 bg-danger-soft text-danger"
+      : "border-warning/20 bg-warning-soft text-warning";
 
   return (
     <div
       role={tone === "error" ? "alert" : "status"}
-      className={`no-print mb-3 flex items-start gap-2 rounded-lg px-3 py-2 text-xs ${styles}`}
+      className={`no-print animate-fade-in mb-3 flex items-start gap-2 rounded-xl border px-3.5 py-2.5 text-xs ${styles}`}
     >
       <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
       <div className="min-w-0 flex-1">{children}</div>
@@ -558,7 +651,7 @@ function Banner({
         <button
           type="button"
           onClick={onDismiss}
-          className="shrink-0 font-medium underline"
+          className="shrink-0 font-medium underline underline-offset-2"
           aria-label="Dismiss"
         >
           Dismiss

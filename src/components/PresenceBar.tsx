@@ -58,13 +58,20 @@ export function PresenceBar({ documentId }: { documentId: string }) {
   if (others.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-1.5" title={`${others.map((v) => v.name).join(", ")} also here`}>
-      <span className="hidden text-[11px] text-[var(--color-muted)] sm:inline">Also here</span>
+    <div
+      className="animate-fade-in flex items-center gap-2 rounded-full bg-surface-2 py-1 pl-2.5 pr-1.5 ring-1 ring-line"
+      title={`${others.map((v) => v.name).join(", ")} also here`}
+    >
+      <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+      </span>
+      <span className="hidden text-[11px] font-medium text-muted sm:inline">Also here</span>
       <div className="flex -space-x-1.5">
         {others.slice(0, 4).map((viewer) => (
           <span
             key={viewer.id}
-            className="flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-white text-[9px] font-semibold text-white"
+            className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-semibold text-white ring-2 ring-surface"
             style={{ backgroundColor: avatarColor(viewer.id) }}
             title={viewer.name}
           >
@@ -72,7 +79,7 @@ export function PresenceBar({ documentId }: { documentId: string }) {
           </span>
         ))}
         {others.length > 4 && (
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-muted)] text-[9px] font-semibold text-white ring-2 ring-white">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-faint text-[9px] font-semibold text-white ring-2 ring-surface">
             +{others.length - 4}
           </span>
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { RotateCcw } from "lucide-react";
 import { apiFetch } from "@/lib/api-client";
 import { absoluteDateTime, relativeTime } from "@/lib/time";
 import { Modal } from "./Modal";
@@ -103,42 +104,45 @@ export function HistoryPanel({
       width="46rem"
     >
       {error && (
-        <p role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p
+          role="alert"
+          className="mb-3 rounded-lg border border-danger/20 bg-danger-soft px-3 py-2 text-xs text-danger"
+        >
           {error}
         </p>
       )}
 
       {versions === null ? (
-        <p className="py-6 text-center text-xs text-[var(--color-muted)]">Loading history…</p>
+        <p className="py-8 text-center text-xs text-muted">Loading history…</p>
       ) : versions.length === 0 ? (
-        <p className="py-6 text-center text-xs text-[var(--color-muted)]">
+        <p className="py-8 text-center text-xs text-muted">
           No earlier versions yet. One is kept the first time you edit this document.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-[15rem_1fr]">
-          <ul className="max-h-80 space-y-1 overflow-y-auto pr-1">
+          <ul className="max-h-80 space-y-1.5 overflow-y-auto pr-1">
             {versions.map((version) => (
               <li key={version.id}>
                 <button
                   type="button"
                   onClick={() => void select(version.id)}
-                  className={`w-full rounded-lg border px-3 py-2 text-left transition ${
+                  className={`w-full rounded-xl border px-3 py-2.5 text-left transition ${
                     selected === version.id
-                      ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)]"
-                      : "border-[var(--color-line)] hover:bg-[var(--color-canvas)]"
+                      ? "border-accent bg-accent-soft shadow-xs"
+                      : "border-line hover:border-line-strong hover:bg-surface-2"
                   }`}
                 >
-                  <span className="block text-xs font-medium">
+                  <span className="block text-xs font-semibold">
                     {relativeTime(version.createdAt, now)}
                   </span>
-                  <span className="block text-[11px] text-[var(--color-muted)]">
+                  <span className="block text-[11px] text-muted">
                     {absoluteDateTime(version.createdAt)}
                   </span>
-                  <span className="mt-0.5 block text-[11px] text-[var(--color-muted)]">
+                  <span className="mt-0.5 block text-[11px] text-muted">
                     {version.authorName ?? "Unknown"} · {version.size} chars
                   </span>
                   {version.label && (
-                    <span className="mt-1 inline-block rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-muted)] ring-1 ring-[var(--color-line)]">
+                    <span className="mt-1.5 inline-block rounded-md bg-warning-soft px-1.5 py-0.5 text-[10px] font-medium text-warning">
                       {version.label}
                     </span>
                   )}
@@ -149,13 +153,13 @@ export function HistoryPanel({
 
           <div className="min-w-0">
             {selected === null ? (
-              <p className="rounded-lg border border-dashed border-[var(--color-line)] px-4 py-10 text-center text-xs text-[var(--color-muted)]">
+              <p className="flex h-full min-h-40 items-center justify-center rounded-xl border border-dashed border-line-strong px-4 text-center text-xs text-muted">
                 Select a version to preview it.
               </p>
             ) : (
               <>
                 <div
-                  className="doc-body max-h-72 overflow-y-auto rounded-lg border border-[var(--color-line)] bg-white p-4 text-sm"
+                  className="doc-body max-h-72 overflow-y-auto rounded-xl border border-line bg-surface-2 p-4 text-sm"
                   // Content is sanitized on write by the server, so what is stored
                   // is already constrained to the editor's tag allowlist.
                   dangerouslySetInnerHTML={{ __html: preview ?? "<p>Loading…</p>" }}
@@ -165,8 +169,9 @@ export function HistoryPanel({
                     type="button"
                     onClick={() => void restore(selected)}
                     disabled={restoring || preview === null}
-                    className="mt-3 rounded-lg bg-[var(--color-accent)] px-3 py-2 text-sm font-medium text-white transition hover:brightness-95 disabled:opacity-50"
+                    className="mt-3 inline-flex items-center gap-2 rounded-xl bg-accent px-3.5 py-2 text-sm font-medium text-on-accent shadow-sm transition hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50"
                   >
+                    <RotateCcw size={14} aria-hidden="true" />
                     {restoring ? "Restoring…" : "Restore this version"}
                   </button>
                 )}

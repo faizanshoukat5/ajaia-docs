@@ -33,8 +33,13 @@ interface Draft {
  *    snapshots what it replaced) — we just surface it.
  *  - A failed save keeps the draft dirty and retries on the next edit, so a
  *    dropped connection does not silently discard work.
+ *  - `enabled: false` (viewers) makes the whole hook inert. The server rejects a
+ *    viewer's PATCH anyway, but the client should never send one: a browser
+ *    extension mutating the read-only editor DOM can produce a ProseMirror
+ *    transaction, and without this guard that phantom edit became a doomed save
+ *    and a spurious error banner.
  */
-export function useAutosave(documentId: string, initialRevision: number) {
+export function useAutosave(documentId: string, initialRevision: number, enabled = true) {
   const [status, setStatus] = useState<SaveStatus>("saved");
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +53,7 @@ export function useAutosave(documentId: string, initialRevision: number) {
   const hasPending = useRef(false);
 
   const flush = useCallback(async (): Promise<void> => {
+    if (!enabled) return;
     if (timer.current) {
       clearTimeout(timer.current);
       timer.current = null;
@@ -90,17 +96,18 @@ export function useAutosave(documentId: string, initialRevision: number) {
           : "Could not save your changes. They are still here — we will retry.",
       );
     }
-  }, [documentId]);
+  }, [documentId, enabled]);
 
   const queue = useCallback(
     (draft: Draft) => {
+      if (!enabled) return;
       pending.current = { ...pending.current, ...draft };
       hasPending.current = true;
       setStatus("dirty");
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => void flush(), AUTOSAVE_DEBOUNCE_MS);
     },
-    [flush],
+    [flush, enabled],
   );
 
   /** Ctrl/Cmd+S saves now instead of letting the browser try to save the page. */
@@ -121,6 +128,7 @@ export function useAutosave(documentId: string, initialRevision: number) {
    * debounce can be as long as it is without risking the last few seconds of work.
    */
   useEffect(() => {
+    if (!enabled) return;
     function persistNow() {
       if (!hasPending.current) return;
       const draft = pending.current;
@@ -142,7 +150,7 @@ export function useAutosave(documentId: string, initialRevision: number) {
       window.removeEventListener("beforeunload", persistNow);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [documentId]);
+  }, [documentId, enabled]);
 
   useEffect(
     () => () => {

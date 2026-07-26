@@ -41,23 +41,23 @@ export function Modal({
         // Clicking the backdrop hits the <dialog> itself, not its content.
         if (event.target === ref.current) onClose();
       }}
-      className="m-auto w-[calc(100vw-2rem)] rounded-xl border border-[var(--color-line)] bg-white p-0 shadow-xl backdrop:bg-black/30"
+      className="animate-pop-in m-auto w-[calc(100vw-2rem)] rounded-2xl border border-line bg-surface p-0 text-ink shadow-xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px]"
       style={{ maxWidth: width }}
     >
       {open && (
         <div className="p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-sm font-semibold">{title}</h2>
+              <h2 className="text-sm font-semibold tracking-tight">{title}</h2>
               {description && (
-                <p className="mt-1 text-xs text-[var(--color-muted)]">{description}</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted">{description}</p>
               )}
             </div>
             <button
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="-m-1 rounded-md p-1 text-[var(--color-muted)] transition hover:bg-[var(--color-canvas)]"
+              className="-m-1 rounded-lg p-1.5 text-muted transition hover:bg-surface-2 hover:text-ink"
             >
               <X size={16} aria-hidden="true" />
             </button>

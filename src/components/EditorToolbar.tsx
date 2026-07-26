@@ -15,6 +15,7 @@ import {
   Underline as UnderlineIcon,
   Undo2,
 } from "lucide-react";
+import { Modal } from "./Modal";
 
 /**
  * Formatting controls.
@@ -56,30 +57,46 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
     else chain.setHeading({ level: Number(value.slice(1)) as 1 | 2 | 3 }).run();
   }
 
-  function toggleLink() {
-    const existing = editor.getAttributes("link").href as string | undefined;
-    // A prompt is the honest choice here: a bespoke link popover is a lot of UI
-    // for a secondary action inside a fixed timebox.
-    const input = window.prompt("Link URL (leave empty to remove)", existing ?? "https://");
-    if (input === null) return;
+  // Link editing happens in a dialog (state below), replacing the earlier
+  // window.prompt. ProseMirror keeps the selection while the dialog is open, and
+  // `chain().focus()` restores it before the command applies.
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkError, setLinkError] = useState<string | null>(null);
+  const hasExistingLink = editor.isActive("link");
 
-    const url = input.trim();
+  function openLinkDialog() {
+    const existing = editor.getAttributes("link").href as string | undefined;
+    setLinkUrl(existing ?? "https://");
+    setLinkError(null);
+    setLinkOpen(true);
+  }
+
+  function applyLink(event: React.FormEvent) {
+    event.preventDefault();
+    const url = linkUrl.trim();
     if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      removeLink();
       return;
     }
     // Only http(s) and mailto survive the server sanitizer; reject the rest here
     // so the user finds out immediately rather than after a save.
     if (!/^(https?:|mailto:)/i.test(url)) {
-      window.alert("Links must start with http://, https:// or mailto:");
+      setLinkError("Links must start with http://, https:// or mailto:");
       return;
     }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    setLinkOpen(false);
+  }
+
+  function removeLink() {
+    editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    setLinkOpen(false);
   }
 
   return (
     <div
-      className="no-print flex flex-wrap items-center gap-0.5 border-b border-[var(--color-line)] bg-white px-2 py-1.5"
+      className="no-print sticky top-14 z-10 flex flex-wrap items-center gap-0.5 rounded-t-2xl border-b border-line bg-surface/95 px-2.5 py-1.5 backdrop-blur"
       role="toolbar"
       aria-label="Text formatting"
     >
@@ -87,7 +104,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
         value={blockValue}
         onChange={(event) => setBlock(event.target.value)}
         aria-label="Text style"
-        className="mr-1 rounded-md border border-[var(--color-line)] bg-white px-2 py-1 text-xs font-medium outline-none focus:border-[var(--color-accent)]"
+        className="mr-1 rounded-lg border border-line bg-surface px-2 py-1.5 text-xs font-medium outline-none transition focus:border-accent"
       >
         <option value="p">Normal text</option>
         <option value="h1">Heading 1</option>
@@ -159,9 +176,73 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
       >
         <Code size={15} aria-hidden="true" />
       </Button>
-      <Button label="Link" active={editor.isActive("link")} onClick={toggleLink}>
+      <Button label="Link" active={hasExistingLink} onClick={openLinkDialog}>
         <Link2 size={15} aria-hidden="true" />
       </Button>
+
+      <Modal
+        open={linkOpen}
+        onClose={() => setLinkOpen(false)}
+        title={hasExistingLink ? "Edit link" : "Add link"}
+        description="Applies to the selected text. http(s) and mailto links only — anything else would be stripped on save."
+      >
+        <form onSubmit={applyLink} className="space-y-3">
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium text-ink-2">URL</span>
+            <input
+              type="text"
+              value={linkUrl}
+              onChange={(event) => {
+                setLinkUrl(event.target.value);
+                setLinkError(null);
+              }}
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- a single-field dialog
+              autoFocus
+              spellCheck={false}
+              placeholder="https://example.com"
+              className="w-full rounded-xl border border-line bg-surface px-3 py-2 font-mono text-sm outline-none transition placeholder:text-faint focus:border-accent focus:ring-2 focus:ring-accent-ring"
+            />
+          </label>
+
+          {linkError && (
+            <p
+              role="alert"
+              className="rounded-lg border border-danger/20 bg-danger-soft px-3 py-2 text-xs text-danger"
+            >
+              {linkError}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between gap-2">
+            {hasExistingLink ? (
+              <button
+                type="button"
+                onClick={removeLink}
+                className="rounded-xl px-3 py-2 text-sm font-medium text-danger transition hover:bg-danger-soft"
+              >
+                Remove link
+              </button>
+            ) : (
+              <span />
+            )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setLinkOpen(false)}
+                className="rounded-xl border border-line px-3.5 py-2 text-sm font-medium transition hover:bg-surface-2"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-xl bg-accent px-3.5 py-2 text-sm font-medium text-on-accent shadow-sm transition hover:bg-accent-hover"
+              >
+                {hasExistingLink ? "Save" : "Add link"}
+              </button>
+            </div>
+          </div>
+        </form>
+      </Modal>
 
       <Divider />
 
@@ -186,7 +267,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
 }
 
 function Divider() {
-  return <span aria-hidden="true" className="mx-1 h-5 w-px bg-[var(--color-line)]" />;
+  return <span aria-hidden="true" className="mx-1 h-5 w-px bg-line" />;
 }
 
 function Button({
@@ -215,10 +296,10 @@ function Button({
       aria-label={label}
       aria-pressed={active ?? undefined}
       title={shortcut ? `${label} (${shortcut})` : label}
-      className={`rounded-md p-1.5 transition disabled:opacity-30 ${
+      className={`rounded-lg p-1.5 transition active:scale-95 disabled:opacity-30 ${
         active
-          ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-          : "text-[var(--color-ink)] hover:bg-[var(--color-canvas)]"
+          ? "bg-accent-soft text-accent"
+          : "text-ink-2 hover:bg-surface-2 hover:text-ink"
       }`}
     >
       {children}

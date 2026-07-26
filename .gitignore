@@ -20,3 +20,4 @@ npm-debug.log*
 .idea/
 *.tsbuildinfo
 next-env.d.ts
+/demo
