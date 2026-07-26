@@ -57,7 +57,9 @@ COPY --from=builder /app/src/db/migrations ./src/db/migrations
 RUN mkdir -p /data && chown -R node:node /data /app
 USER node
 
-VOLUME ["/data"]
+# No VOLUME declaration on purpose: the hosts that run this mount /data through
+# their own config (fly.toml's [[mounts]], Railway's volume settings), and
+# Railway rejects images that declare VOLUME.
 EXPOSE 3000
 
 # Migrations and first-boot seeding happen in src/instrumentation.ts, so there is
