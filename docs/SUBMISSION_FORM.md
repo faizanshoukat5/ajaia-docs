@@ -1,7 +1,4 @@
-<!--
-  Text to paste into the assignment form's "Submission (Markdown)" field.
-  Fill in the two bracketed links first.
--->
+
 
 # Ajaia Docs — Full Stack Product Engineer take-home
 
@@ -49,7 +46,7 @@ Each clause got real engineering. Everything outside it was cut on purpose and l
 
 **Persistence** — SQLite via Drizzle. Documents, shares, history and presence all survive restarts; content is stored as sanitized HTML so formatting round-trips exactly.
 
-**Beyond the brief** — version history (snapshot, preview, restore-forward), concurrent-edit detection, presence indicators, and export to Markdown/HTML/text plus print-to-PDF.
+**Beyond the brief** — version history (snapshot, preview, restore-forward), concurrent-edit detection, presence indicators, export to Markdown/HTML/text plus print-to-PDF with print-safe styling and per-document page titles, a full light/dark theme that follows the OS preference with a persistent in-app toggle, live word count and reading time, and instant document search.
 
 ---
 
@@ -100,9 +97,10 @@ Real-time co-editing (CRDT + socket server) · comments/suggestions · images an
 
 1. A Playwright end-to-end test of the core journey — the biggest genuine gap.
 2. Build and fix the Docker image, so the least-trustworthy artifact becomes trustworthy.
-3. Replace the `window.prompt` link editor with a real popover — the most visibly unpolished thing in the UI.
-4. Word count and document outline.
-5. Share links with expiry, as a first step toward inviting people without accounts.
+3. A document outline panel built from the headings.
+4. Share links with expiry, as a first step toward inviting people without accounts.
+
+(Two earlier items on this list — a proper link-editing dialog and a live word count — have since been built.)
 
 I would **not** start real-time collaboration in that window — it is the most impressive-sounding feature and the one most likely to end as a broken half-build.
 
@@ -110,7 +108,7 @@ I would **not** start real-time collaboration in that window — it is the most 
 
 ## AI workflow (summary — full note in `AI_WORKFLOW.md`)
 
-Built as a paired effort with **Claude Code (Opus)**, working together across the API layer, the server logic, the editor front end and the tests. I set the scope and architecture, we worked through the implementation together, and I reviewed, corrected and rejected output as we went.
+Built as a paired effort with **Claude Code (Opus)**, working together across the API layer, the server logic, the editor front end and the tests. I set the scope and architecture, we worked through the implementation together, and I reviewed, corrected and rejected output as we went — and I worked in the code directly too, making hands-on adjustments, fixes and tuning throughout rather than only reviewing.
 
 **Where it helped:** the route scaffolding, the schema/migration pair, and the Tailwind UI are most of the line count and little of the difficulty — moving through them quickly left room to spend real time on autosave semantics, the sanitizer, and the concurrency model. Several API endpoints changed shape mid-build once we started exercising them with real requests.
 

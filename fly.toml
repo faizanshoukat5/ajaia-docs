@@ -5,8 +5,9 @@
 #   fly secrets set SESSION_SECRET="$(openssl rand -base64 32)"
 #   fly deploy
 #
-# Fly's free allowance includes a small persistent volume, which is what makes
-# SQLite a viable choice here.
+# Fly volumes give SQLite the persistent disk it needs. Note: accounts created
+# after Oct 2024 have no free tier — expect ~$2-4/month for this footprint
+# (auto_stop_machines suspends the machine when idle, which keeps it low).
 
 app = "ajaia-docs"
 primary_region = "iad"

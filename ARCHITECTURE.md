@@ -195,7 +195,10 @@ than the source of truth.
 
 ## What I would do next
 
-With another 2–4 hours, in the order I would actually do it:
+Two items from the original version of this list have since been done: the
+`window.prompt` link editor was replaced with a proper dialog, and a live word
+count / reading time was added to the editor. What remains, in the order I
+would do it:
 
 1. **A Playwright end-to-end test** of the core journey — sign in, create,
    format, share, switch user, verify read-only. The current suite covers the
@@ -204,11 +207,8 @@ With another 2–4 hours, in the order I would actually do it:
 2. **Verify and fix the Docker build.** It is written but was never executed
    (Docker was not installed on the build machine), which makes it the least
    trustworthy artifact in the repo.
-3. **A proper link editor** — the current one is a `window.prompt`, which is the
-   most obviously unpolished thing in the UI.
-4. **Word count and a document outline** — cheap, and they make a long document
-   feel like a real editor.
-5. **Per-document share links with an expiry**, as the first step toward inviting
+3. **A document outline panel** for long documents, built from the headings.
+4. **Per-document share links with an expiry**, as the first step toward inviting
    people who do not yet have accounts.
 
 I would not start real-time collaboration in that window. It is the most

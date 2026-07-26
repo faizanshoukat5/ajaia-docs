@@ -7,6 +7,19 @@ Built as a timeboxed take-home. The goal was depth in a few areas that matter
 rather than shallow coverage of everything Google Docs does. What was cut, and
 why, is in [ARCHITECTURE.md](./ARCHITECTURE.md).
 
+![The editor in dark mode](docs/screenshots/editor-dark.png)
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/login-light.png" alt="Login page, light theme" /></td>
+    <td><img src="docs/screenshots/login-dark.png" alt="Login page, dark theme" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/documents.png" alt="Document list" /></td>
+    <td><img src="docs/screenshots/editor-light.png" alt="Editor, light theme" /></td>
+  </tr>
+</table>
+
 ---
 
 ## Quick start
@@ -123,6 +136,15 @@ so formatting round-trips exactly.
 - **Presence indicators** — avatars of others viewing the same document, via a
   polled heartbeat.
 - **Export** — Markdown, HTML, plain text, and print-to-PDF via the browser.
+- **Light and dark theme** — follows the OS preference, with an in-app toggle
+  that persists. Applied before first paint, so there is no flash of the wrong
+  theme.
+- **Word count and reading time** — live in the editor footer.
+- **Document search** — instant client-side filtering of the document list by
+  title, content preview, or owner.
+- **Print-aware styling** — printing (or saving to PDF) always renders on white
+  regardless of the on-screen theme, uses the document title as the page title,
+  and prints each web link's target after it.
 
 ---
 
@@ -152,6 +174,10 @@ unique indexes for real.
 ---
 
 ## Deployment
+
+> **Step-by-step commands for Fly.io, Render, and Railway — including Windows
+> equivalents and troubleshooting — are in
+> [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md).**
 
 The app is a standard Next.js server plus one SQLite file. The only real
 requirement is **a writable, persistent disk** for that file.
@@ -194,8 +220,10 @@ the comments in that file before deploying.
 ### Option B — Docker / Fly.io
 
 A [`Dockerfile`](./Dockerfile) (multi-stage, non-root, standalone output) and
-[`fly.toml`](./fly.toml) are included. Fly's free allowance includes a persistent
-volume, which is what makes SQLite viable there.
+[`fly.toml`](./fly.toml) are included. Fly volumes give SQLite the persistent
+disk it needs; expect ~$2–4/month (new Fly accounts have no free tier — see
+[docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for the current pricing landscape
+and zero-cost alternatives).
 
 ```bash
 fly launch --no-deploy --copy-config --name <your-app>

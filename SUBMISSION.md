@@ -113,6 +113,11 @@ Not required, and not pursued at the expense of the core:
 - ✅ **Export** — Markdown, HTML, plain text, print-to-PDF
 - ✅ **Role-based permissions** beyond basic access — viewer/editor split
 - ✅ **Collaboration indicators** — presence avatars via polled heartbeat
+- ✅ **Light and dark theme** — OS-aware with a persistent in-app toggle
+- ✅ **Word count and reading time** — live in the editor footer
+- ✅ **Document search** — instant client-side filter over the list
+- ✅ **Print/PDF polish** — per-document page titles, print-safe styling from
+  either theme, link targets printed after anchors
 
 ---
 
@@ -149,10 +154,11 @@ re-seeding a database that already has data.
 1. Playwright end-to-end test of the core journey — the biggest genuine gap.
 2. Build and fix the Docker image, so the least-trustworthy artifact becomes
    trustworthy.
-3. Replace the `window.prompt` link editor with a real popover — the most
-   visibly unpolished thing in the UI.
-4. Word count and document outline.
-5. Share links with expiry, as the first step toward inviting new users.
+3. A document outline panel built from the headings.
+4. Share links with expiry, as the first step toward inviting new users.
+
+(Two earlier items on this list — a proper link-editing dialog and a live word
+count — have since been built.)
 
 Reasoning for that order, and for what I would *not* start, is in
 [ARCHITECTURE.md](./ARCHITECTURE.md#what-i-would-do-next).

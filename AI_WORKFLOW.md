@@ -4,7 +4,9 @@ This project was built as a **paired effort between me and Claude Code (Opus)**,
 working together across the codebase — the API layer, the server logic, the
 editor front end, and the tests. It was a genuine back-and-forth: I set the
 scope and the architecture, we worked through the implementation together, and I
-reviewed, corrected and rejected output as we went.
+reviewed, corrected and rejected output as we went. I also worked in the code
+directly — making adjustments, fixes and tuning by hand throughout the build,
+not only reviewing generated diffs.
 
 I have kept this note specific and unflattering where that is accurate. Every
 incident below actually happened during the build; none are illustrative
@@ -46,6 +48,14 @@ revision/conflict handling, the sanitizer allowlist, and the import pipeline all
 went through multiple passes. AI moved fastest on the structural work; the
 correctness details came from reviewing what it produced against what the product
 actually needed.
+
+**I made hands-on adjustments in the code.** Not everything went through a
+prompt: I edited files directly where that was faster or where the fix needed
+judgment — adjusting behaviour and copy, tuning the UI and styling, correcting
+details after each pass, and reshaping pieces of generated code that were
+structurally fine but not what the product needed. The design system and its
+light/dark theming in particular went through several rounds of this kind of
+direct adjustment.
 
 **I owned verification.** Everything in the section below.
 

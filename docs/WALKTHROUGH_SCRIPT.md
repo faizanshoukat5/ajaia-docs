@@ -1,176 +1,151 @@
-# Walkthrough video script (3–5 minutes)
+# Walkthrough video script
 
-A shot-by-shot script keyed to the actual UI. Timings are a guide; the whole
-thing runs comfortably in about 4:15 at a normal speaking pace.
+Two ways to produce the video. **The brief asks for 3–5 minutes covering the
+user flow, what works, what was deprioritized, key decisions, and the AI
+workflow** — so whichever route you take, the closing section on decisions is
+not optional.
 
-## Before you record
-
-```bash
-npm run db:reset && npm run setup   # clean, known-good demo state
-npm run dev
-```
-
-- Have **two browser profiles** (or one normal + one incognito) open side by
-  side, so you can be Ada and Alan simultaneously without signing in and out.
-- Zoom the browser to ~110% so text is legible in the recording.
-- Have a `.docx` or `.md` file on your desktop, ready to drag. Any Word document
-  with a heading works.
-- Close unrelated tabs and notifications.
-
----
-
-## 0:00–0:25 — What it is and the one decision that shaped it
-
-> "This is Ajaia Docs — a collaborative document editor built as a timeboxed
-> take-home. Next.js, TipTap for rich text, SQLite for storage.
->
-> The brief could absorb unlimited scope, so I picked one sentence to defend: a
-> document you can actually write in, that other people can actually open, where
-> nothing you type is ever lost. I'll show you those three things, then tell you
-> what I deliberately didn't build."
-
-**On screen:** the login page.
+- **Option A — use the full automated recording.** `demo/ajaia-demo-full.webm`
+  (4:46, 1280×720) walks **every feature** end to end with subtitle captions
+  burned in: sign-in, list/tabs/search, create, rename, autosave states, all
+  formatting, the link dialog (including a rejected scheme), undo/redo, word
+  count, append-import, export, delete, import-with-title-inference, import
+  rejection, live presence, a **real concurrent-edit conflict** (a second
+  session saves mid-edit and the snapshot lands in history, labeled), version
+  history, sharing, dark mode, and the viewer's read-only enforcement.
+  A matching `demo/ajaia-demo-full.srt` subtitle file is alongside it for
+  YouTube. Record a short voice-over on top (Clipchamp is preinstalled on
+  Windows), or upload as-is and append 1–2 minutes of yourself covering
+  Part 2 below — the brief requires the decisions and AI-workflow story,
+  which captions alone don't fully deliver. (A shorter 1:23 cut without
+  captions is at `demo/ajaia-demo.webm`.)
+- **Option B — record live.** Follow Part 1 as stage directions yourself, then
+  continue into Part 2. Before recording: `npm run db:reset && npm run setup`,
+  then start the app and use two browser profiles so you can be Ada and Alan
+  side by side.
 
 ---
 
-## 0:25–0:45 — Sign in
+## Part 1 — Product demo narration
 
-> "Three seeded accounts, one click each — because testing sharing means
-> switching users constantly, and I didn't want reviewers typing credentials.
-> These buttons hit the real login endpoint with the documented demo password;
-> there's no back door that bypasses auth."
+Timed to `demo/ajaia-demo.webm`. Timestamps are approximate — cue off what is
+on screen, not the clock.
 
-**Do:** click **Ada Lovelace**.
+### ~0:00 — Landing page (light)
 
----
+> "This is Ajaia Docs — a collaborative document editor. Next.js, TipTap on
+> ProseMirror for rich text, SQLite for storage. The login page states the one
+> sentence the whole build defends: a document you can write in, that others
+> can open, where nothing you type is lost."
 
-## 0:45–1:15 — The document list
+### ~0:05 — One-click sign-in as Ada
 
-> "The list separates what I own from what's been shared with me. That's a
-> structural split rather than a badge you have to scan for — and each row still
-> shows its role and owner, so the information isn't only in the tab."
+> "Three seeded accounts, one click each — the buttons hit the real login
+> endpoint with the documented demo password. There's no back door that skips
+> auth."
 
-**Do:** click **Shared with me**, point at *File import — spec* — "shared by
-Grace, view-only." Return to **My documents**.
+### ~0:10 — Document list: search, owned vs shared
 
----
+> "The list separates what I own from what's shared with me — a structural
+> split, not a badge. Search filters instantly, client-side, over title,
+> content and owner. Every card shows its role, its last editor, and its
+> collaborator count."
 
-## 1:15–2:00 — Editing and autosave
+### ~0:25 — Editing and autosave
 
-**Do:** open **Q3 Productivity Roadmap**.
+> "Inside a document: headings, bold, italics, lists, quotes, code, links.
+> Watch the pill in the header while text is typed — unsaved, saving, saved.
+> Autosave is debounced about 900 milliseconds, one request in flight at a
+> time, and a keepalive flush on tab close catches the last few seconds. A
+> failed save stays dirty and retries — never a green checkmark over lost
+> work."
 
-> "Standard rich text — headings, bold, italic, underline, lists, quotes, code,
-> links. It's ProseMirror underneath, so this is a real document model, not
-> contenteditable guesswork."
+### ~0:45 — Link dialog
 
-**Do:** select a line → make it **Heading 2**. Bold a word. Add a bullet.
+> "Links go through a proper dialog that validates the scheme up front — only
+> http, https and mailto survive the server-side sanitizer anyway, so the UI
+> refuses early instead of failing late."
 
-> "Watch the header while I type."
+### ~0:55 — Share dialog
 
-**Do:** type a sentence. Point at the indicator moving through *Unsaved changes →
-Saving… → Saved just now*.
+> "Sharing: one owner, viewer and editor levels. Editors deliberately can't
+> re-share — the access graph stays exactly what the owner approved."
 
-> "Autosave is debounced about 900 milliseconds. The part I actually spent time
-> on is the failure cases: one request in flight at a time, edits during a save
-> get coalesced, a failed save stays dirty and retries instead of showing a green
-> checkmark over lost work — and closing the tab mid-edit fires a keepalive
-> request so the last few seconds still land."
+### ~1:00 — Version history
 
-**Do:** rename the document in the header. Point at it saving.
+> "Version history snapshots automatically, at most once a minute — and
+> unconditionally whenever a concurrent edit is about to be overwritten.
+> Restore writes forward as a new revision, so restoring is itself undoable."
 
----
+### ~1:05 — Dark mode
 
-## 2:00–2:40 — File import
+> "The whole app is theme-aware — follows the OS preference, toggles in-app,
+> applied before first paint."
 
-> "Import is the file-handling piece. Supported types are stated in the UI, not
-> just the README — .txt, .md, .markdown and .docx, up to 5 MB."
+### ~1:10 — Switch to Alan, read-only enforcement
 
-**Do:** back to the list → **Import a file** → pick your `.docx`.
-
-> "It converts to the editor's format, and titles the document from the file's
-> first heading rather than calling it 'notes.docx'."
-
-**Do:** if warnings appear, point at the banner.
-
-> "Word styles that don't map onto this editor get reported rather than silently
-> dropped — I'd rather tell you something was lost than pretend it wasn't."
-
-**Optional (fast):** show the **Import** button inside a document — "same parser,
-but here you can append to a draft or replace it."
-
----
-
-## 2:40–3:30 — Sharing and permissions (the important part)
-
-**Do:** open the roadmap → **Share**.
-
-> "One owner, and two access levels: can-view and can-edit. Editors deliberately
-> can't re-share — that keeps the access graph to what the owner actually
-> approved."
-
-**Do:** point out Grace as editor, Alan as viewer.
-
-**Switch to the second browser window, signed in as Alan.** Open the same
-document.
-
-> "Same document as Alan, who only has view access. No formatting toolbar, the
-> body isn't editable, and Share and Delete aren't there."
-
-> "And this isn't just hidden UI — every route re-checks the role server-side. If
-> you hand-craft the PATCH request, you get a 403. If you don't have access at
-> all you get a 404, not a 403, so document IDs can't be used to probe what
-> exists."
+> "Now the same document as Alan, who has view-only access. No toolbar, no
+> Share, no Delete, an explicit read-only notice. And this isn't hidden UI —
+> every route re-resolves the role server-side. A hand-crafted PATCH gets a
+> 403; a document you can't see at all returns a 404, not a 403, so IDs can't
+> be used to probe what exists."
 
 ---
 
-## 3:30–4:00 — Concurrent edits: the honest answer
+## Part 2 — Decisions and AI workflow (record over the repo/docs, ~2–3 min)
 
-> "Here's the thing I want to be straight about. Real-time co-editing needs a
-> CRDT and a socket server — that's a different architecture, not an increment,
-> and half-built it corrupts documents. So I didn't build it. Here's what I built
-> instead."
+### Scope decision
 
-**Do:** as Ada, type into the roadmap. As Alan — *if you granted him edit access*
-— type into the same document. (Or narrate over the version history panel.)
+> "The brief could absorb unlimited scope, so I cut deliberately: no comments,
+> no images or tables, no email invites, and above all no real-time
+> co-editing. A CRDT plus a socket server is a different architecture, not an
+> increment — half-built, it corrupts documents. What I built instead is
+> honest: every save carries the revision it was based on; if someone else
+> saved in between, the server snapshots what it's about to overwrite into
+> history *before* applying the write, and tells you. Last-write-wins, but
+> nothing is ever silently destroyed."
 
-**Do:** open **History**.
+### Security decisions
 
-> "Every save carries the revision the client was editing. If someone else saved
-> in between, the server snapshots the content it's about to overwrite *before*
-> applying the write, and tells you. Last-write-wins — but nothing is ever
-> silently destroyed, and you get a link straight to the version that was
-> replaced."
+> "Content is sanitized on write, not on read — stored data is always safe, so
+> a future surface that forgets to sanitize can't reintroduce the hole. The
+> allowlist is exactly the set of tags the editor can produce. And
+> authorization lives in pure functions with no imports, which is why the full
+> role-by-capability matrix is tested exhaustively — including fail-closed on
+> unrecognized role data."
 
-**Do:** click a version, show the preview, mention **Restore**.
+### Testing
 
-> "Restore writes forward as a new revision, so restoring is itself undoable."
+> "150 tests, weighted where bugs are expensive: the permission matrix, the
+> XSS sanitizer, and persistence against a real SQLite built from the actual
+> migration files. Beyond the suite, I drove the running production build over
+> HTTP as three concurrent users and asserted every permission rule as a
+> status code."
+
+### AI workflow
+
+> "The project was built as a paired effort with Claude Code, and I worked in
+> the code directly as well. The AI note in the repo is specific about what I
+> rejected: invented dependency versions, a regex with raw control bytes that
+> only a hexdump revealed, a character-class range that silently ate digits,
+> and two failing tests where the test was wrong, not the code. Three real
+> bugs passed both review and the whole test suite and only showed up by
+> running the app — which is why the verification section is the part of that
+> document I'd defend hardest."
+
+### Close
+
+> "What I'd do next, in order: a Playwright end-to-end test of this exact
+> journey, verifying the Docker build, a document outline panel, and share
+> links with expiry. Thanks for watching."
 
 ---
 
-## 4:00–4:15 — Scope and close
+## Recording notes
 
-> "What I cut, on purpose: comments, images, tables, PDF export, email invites,
-> and real-time collaboration. Each one is in the architecture note with the
-> reasoning.
->
-> On testing — 150 tests, weighted toward the permission matrix, the HTML
-> sanitizer and the persistence layer. The database tests run against real SQLite
-> built from the actual migrations, and the .docx tests build a real Word file
-> and run it through the parser.
->
-> Three of the real bugs I found only showed up by running the app — including
-> config that validated at first login instead of at boot, and exports printing
-> the title twice. Those are written up in the AI workflow note, along with what
-> I rejected from the generated code."
-
----
-
-## Notes
-
-- **Don't demo the signup form** unless you have spare time — it works, but it
-  is not what is being evaluated.
-- **If a save indicator seems stuck**, it is likely a stale dev server. Restart
-  before recording.
-- The single most persuasive 20 seconds is the **side-by-side owner/viewer
-  comparison**. Do not rush it.
-- If you run long, cut the import section to just the list-page flow.
+- The single most persuasive moment is the **owner → viewer cut** (~1:10 in
+  the recording). Give it air.
+- If recording live, zoom the browser to ~110% and close unrelated tabs.
+- If a save indicator seems stuck, restart the server before recording.
+- `demo/ajaia-demo.webm` is git-ignored — upload it (or your final edit) as an
+  unlisted YouTube/Loom/Drive video and put the URL in `VIDEO.txt`.

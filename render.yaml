@@ -6,8 +6,8 @@
 # NOTE ON FREE TIER: persistent disks are a paid feature on Render. On the free
 # plan, remove the `disk:` block below — the app still runs and re-seeds itself
 # on each cold start (see src/instrumentation.ts), but user-created documents do
-# not survive a restart. Fly.io's free allowance does include a volume; see
-# fly.toml and README.md.
+# not survive a restart, and idle services spin down (~1 min cold start). See
+# docs/DEPLOYMENT.md for the full comparison of hosting options.
 services:
   - type: web
     name: ajaia-docs
