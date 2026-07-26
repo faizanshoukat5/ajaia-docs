@@ -5,18 +5,25 @@
 
 ---
 
-## ⚠️ Before you submit this — three things need your action
+## 🔗 Live deployment
 
-This package is complete except for items that require your accounts or your
-voice. They are marked **[ACTION NEEDED]** below.
+**https://ai-symptom-analyzer-production.up.railway.app**
 
-1. **Deploy it** and paste the URL into this file and the README. Instructions:
-   [README.md § Deployment](./README.md#deployment). The verified path is
-   `npm ci && npm run build && npm start` with `SESSION_SECRET` set.
-2. **Record the walkthrough video** and put the link in `VIDEO.txt`. A
-   shot-by-shot script keyed to the real UI is in
-   [docs/WALKTHROUGH_SCRIPT.md](./docs/WALKTHROUGH_SCRIPT.md).
-3. **Read [AI_WORKFLOW.md](./AI_WORKFLOW.md) and confirm it matches your account
+Railway, Docker image, persistent volume at `/data`. The database migrates and
+seeds itself on first boot, so the three demo accounts below work immediately.
+Verified live: every rule in the permission matrix (viewer edit/delete → 403,
+editor re-share → 403, no-access → 404, unauthenticated → 401) plus round-trip
+persistence.
+
+> The hostname is inherited from an earlier project on the same free-tier
+> account — the app it serves is this one.
+
+## ⚠️ Before you submit this — two things need your action
+
+1. **Record the walkthrough video** and put the link in `VIDEO.txt`. A captioned
+   screen recording of every feature is at `demo/ajaia-demo-full.webm`, with a
+   narration script in [docs/WALKTHROUGH_SCRIPT.md](./docs/WALKTHROUGH_SCRIPT.md).
+2. **Read [AI_WORKFLOW.md](./AI_WORKFLOW.md) and confirm it matches your account
    of how this was built.** It describes a paired effort with Claude Code across
    the code and the API layer, with the scoping, architecture and verification on
    your side. Reviewers will ask about specifics in the interview, so make sure

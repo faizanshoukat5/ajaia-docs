@@ -2,7 +2,7 @@
 
 # Ajaia Docs — Full Stack Product Engineer take-home
 
-**Live app:** [PASTE DEPLOYMENT URL]
+**Live app:** https://ai-symptom-analyzer-production.up.railway.app
 **Walkthrough video:** [PASTE VIDEO URL]
 **Google Drive folder:** [PASTE DRIVE FOLDER URL]
 
