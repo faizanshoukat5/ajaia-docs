@@ -110,9 +110,9 @@ I would **not** start real-time collaboration in that window — it is the most 
 
 ## AI workflow (summary — full note in `AI_WORKFLOW.md`)
 
-Built with **Claude Code (Opus)** as an agentic pair. It wrote most of the source text; my work was scoping, architectural decisions, review, and verification.
+Built as a paired effort with **Claude Code (Opus)**, working together across the API layer, the server logic, the editor front end and the tests. I set the scope and architecture, we worked through the implementation together, and I reviewed, corrected and rejected output as we went.
 
-**Where it helped:** ~14 API routes, the schema/migration pair, and the Tailwind UI are most of the line count and little of the difficulty — generating them left room to spend real time on autosave semantics, the sanitizer, and the concurrency model.
+**Where it helped:** the route scaffolding, the schema/migration pair, and the Tailwind UI are most of the line count and little of the difficulty — moving through them quickly left room to spend real time on autosave semantics, the sanitizer, and the concurrency model. Several API endpoints changed shape mid-build once we started exercising them with real requests.
 
 **What I rejected or fixed:**
 - **Invented dependency versions** — `@types/react-dom@19.2.4` does not exist; `lucide-react` was pinned a whole major line off. Switched to querying the registry for every pin.
@@ -124,4 +124,4 @@ Built with **Claude Code (Opus)** as an agentic pair. It wrote most of the sourc
 
 **Three bugs that only running it could find** (all passed code review and the full test suite): config validated at first login instead of at boot, so a correct password 500'd while a wrong one 401'd; `output: "standalone"` silently breaking `npm start`; and exports printing the document title twice.
 
-**Honest assessment:** the error distribution was distinctly non-human — fluent and structurally sound while confidently wrong about versions, occasionally emitting bytes that were not what they appeared to be. That is precisely why skim-reading generated code is not review. The parts of this project worth defending are decisions, not code: the AI implemented every one faithfully once chosen, and proposed none of them.
+**Honest assessment:** the error distribution was distinctly non-human — fluent and structurally sound while confidently wrong about versions, occasionally emitting bytes that were not what they appeared to be. That is precisely why skim-reading generated code is not review. The parts of this project worth defending are decisions, not code — they came from the product side of the pairing, and the implementation followed once they were made.

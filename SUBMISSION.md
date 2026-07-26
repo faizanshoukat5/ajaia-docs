@@ -17,9 +17,10 @@ voice. They are marked **[ACTION NEEDED]** below.
    shot-by-shot script keyed to the real UI is in
    [docs/WALKTHROUGH_SCRIPT.md](./docs/WALKTHROUGH_SCRIPT.md).
 3. **Read [AI_WORKFLOW.md](./AI_WORKFLOW.md) and confirm it matches your account
-   of how this was built.** It states plainly that Claude Code wrote most of the
-   source. Adjust it so it is accurate to you — do not submit a description of a
-   process you did not follow.
+   of how this was built.** It describes a paired effort with Claude Code across
+   the code and the API layer, with the scoping, architecture and verification on
+   your side. Reviewers will ask about specifics in the interview, so make sure
+   every claim in it is one you can speak to.
 
 ---
 
