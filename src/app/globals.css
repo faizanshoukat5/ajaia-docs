@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f6f7f9;
+  --color-ink: #1f2328;
+  --color-muted: #656d76;
+  --color-line: #d7dbe0;
+  --color-accent: #1a73e8;
+  --color-accent-soft: #e8f0fe;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible focus for keyboard users, suppressed for mouse clicks. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/*
+ * Document typography.
+ *
+ * Applied to both the TipTap editing surface and the read-only/preview renderers
+ * so what you type, what a viewer sees, and what a version preview shows are all
+ * laid out identically. Tailwind's typography plugin would do this too, but this
+ * is a short, explicit list scoped to exactly the tags our sanitizer allows.
+ */
+.doc-body {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+
+.doc-body:focus {
+  outline: none;
+}
+
+.doc-body > * + * {
+  margin-top: 0.85em;
+}
+
+.doc-body h1 {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 1.6em;
+}
+
+.doc-body h2 {
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 1.5em;
+}
+
+.doc-body h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.4em;
+}
+
+.doc-body > h1:first-child,
+.doc-body > h2:first-child,
+.doc-body > h3:first-child {
+  margin-top: 0;
+}
+
+.doc-body ul,
+.doc-body ol {
+  padding-left: 1.6rem;
+}
+
+.doc-body ul {
+  list-style: disc;
+}
+
+.doc-body ol {
+  list-style: decimal;
+}
+
+.doc-body li > ul,
+.doc-body li > ol {
+  margin-top: 0.3em;
+}
+
+.doc-body li + li {
+  margin-top: 0.25em;
+}
+
+.doc-body li p {
+  margin: 0;
+}
+
+.doc-body blockquote {
+  border-left: 3px solid var(--color-line);
+  padding-left: 1rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.doc-body pre {
+  background: #f0f2f4;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  font-style: normal;
+}
+
+.doc-body pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.doc-body code {
+  background: #f0f2f4;
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+.doc-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.doc-body hr {
+  border: none;
+  border-top: 1px solid var(--color-line);
+  margin: 1.6em 0;
+}
+
+.doc-body strong {
+  font-weight: 600;
+}
+
+/* Empty-document hint, rendered by TipTap's Placeholder extension. */
+.doc-body p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #9aa0a6;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Keep the page card readable on phones without a separate layout. */
+@media (max-width: 640px) {
+  .doc-page {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media print {
+  /* Print-to-PDF is the intended PDF path, so hide the app chrome. */
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .doc-page {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}

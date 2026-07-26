@@ -1,0 +1,41 @@
+# Fly.io configuration. Deploy with:
+#
+#   fly launch --no-deploy --copy-config --name <your-app-name>
+#   fly volumes create ajaia_data --size 1 --region iad
+#   fly secrets set SESSION_SECRET="$(openssl rand -base64 32)"
+#   fly deploy
+#
+# Fly's free allowance includes a small persistent volume, which is what makes
+# SQLite a viable choice here.
+
+app = "ajaia-docs"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3000"
+  DATABASE_PATH = "/data/ajaia.db"
+
+# SQLite is single-writer, so run exactly one machine and never scale this out
+# without moving to Postgres first. See ARCHITECTURE.md.
+[[mounts]]
+  source = "ajaia_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

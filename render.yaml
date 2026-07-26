@@ -1,0 +1,29 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploys as a plain Node service (no Docker). A persistent disk is attached so
+# the SQLite database survives restarts and redeploys.
+#
+# NOTE ON FREE TIER: persistent disks are a paid feature on Render. On the free
+# plan, remove the `disk:` block below — the app still runs and re-seeds itself
+# on each cold start (see src/instrumentation.ts), but user-created documents do
+# not survive a restart. Fly.io's free allowance does include a volume; see
+# fly.toml and README.md.
+services:
+  - type: web
+    name: ajaia-docs
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /login
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /var/data/ajaia.db
+      - key: NODE_VERSION
+        value: "24"
+    disk:
+      name: ajaia-data
+      mountPath: /var/data
+      sizeGB: 1

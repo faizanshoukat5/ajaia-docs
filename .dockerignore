@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.gitignore
+data
+.fixtures
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.local
+*.log
+README.md
+ARCHITECTURE.md
+AI_WORKFLOW.md
+SUBMISSION.md
+docs

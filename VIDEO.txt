@@ -1,0 +1,24 @@
+WALKTHROUGH VIDEO
+=================
+
+STATUS: NOT YET RECORDED  --  replace this file's contents before submitting.
+
+Video URL: <PASTE YOUR UNLISTED LOOM / YOUTUBE / VIMEO LINK HERE>
+
+A shot-by-shot script for the 3-5 minute walkthrough, keyed to the actual UI,
+is in docs/WALKTHROUGH_SCRIPT.md. It covers everything the brief asks for:
+
+  - the main user flow
+  - what works end to end
+  - what was intentionally deprioritized
+  - key implementation decisions
+  - how AI supported the workflow
+
+Before recording:
+
+  npm run db:reset && npm run setup
+  npm run dev
+
+Open two browser profiles (or one normal + one incognito) so you can be Ada and
+Alan at the same time. The side-by-side owner/viewer comparison is the most
+persuasive part of the demo.
