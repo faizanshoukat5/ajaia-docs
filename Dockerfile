@@ -53,14 +53,24 @@ COPY --from=builder /app/public ./public
 # in the image — the standalone trace only follows JavaScript imports.
 COPY --from=builder /app/src/db/migrations ./src/db/migrations
 
+# gosu drops privileges in the entrypoint after it has fixed volume ownership.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gosu \
+    && rm -rf /var/lib/apt/lists/*
+
 # `node` is a pre-existing unprivileged user in the base image.
 RUN mkdir -p /data && chown -R node:node /data /app
-USER node
 
 # No VOLUME declaration on purpose: the hosts that run this mount /data through
 # their own config (fly.toml's [[mounts]], Railway's volume settings), and
 # Railway rejects images that declare VOLUME.
 EXPOSE 3000
+
+# The entrypoint starts as root only long enough to chown the mounted volume,
+# then execs the server as `node` — see docker-entrypoint.sh.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
 # Migrations and first-boot seeding happen in src/instrumentation.ts, so there is
 # no separate release command to forget.
