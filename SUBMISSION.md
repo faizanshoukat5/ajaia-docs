@@ -1,32 +1,46 @@
 # Submission contents
 
 **Project:** Ajaia Docs — a lightweight collaborative document editor
-**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · TipTap 3 · SQLite + Drizzle · Tailwind 4 · Vitest
+**Stack:** Next.js 16 (App Router) · React 19 · TypeScript · TipTap 3 (ProseMirror) · SQLite + Drizzle · Tailwind 4 · Vitest
 
 ---
 
-## 🔗 Live deployment
+## For the reviewer — everything you need, in one place
 
-**https://ajaia-docs.up.railway.app**
+| | |
+| --- | --- |
+| **Live app** | **https://ajaia-docs.up.railway.app** |
+| **Walkthrough video** | **https://youtu.be/qyioRI18x8U** (4:47, captioned) |
+| **Source** | https://github.com/faizanshoukat5/ajaia-docs — also in this folder as `ajaia-docs-source.zip` |
+| **Sign in** | One-click buttons on the login page. Password for all three: `password123` |
 
-Railway, Docker image, persistent volume at `/data`. The database migrates and
-seeds itself on first boot, so the three demo accounts below work immediately.
-Verified live: every rule in the permission matrix (viewer edit/delete → 403,
-editor re-share → 403, no-access → 404, unauthenticated → 401) plus round-trip
-persistence.
+**Test accounts** — seeded automatically, on the live app and locally:
 
-## 🎥 Walkthrough video
+| Email | Password | Demonstrates |
+| --- | --- | --- |
+| `ada@ajaia.test` | `password123` | Owner of two shared documents; also a **viewer** on one of Grace's |
+| `grace@ajaia.test` | `password123` | **Editor** on Ada's roadmap; owns her own document |
+| `alan@ajaia.test` | `password123` | **Viewer** on the roadmap — read-only, enforced server-side |
 
-**https://youtu.be/qyioRI18x8U** — 4:47, captioned, covering every feature end
-to end including a real concurrent-edit conflict and read-only enforcement.
+**Fastest way to see the access model (about a minute):** open *Q3 Productivity
+Roadmap* as Ada, then sign in as Alan and open the same document. The toolbar is
+gone, the body is not editable, and Share/Delete are absent — and it is enforced
+on the server, not merely hidden. A hand-crafted `PATCH` returns 403; a document
+you have no access to returns **404, not 403**, so IDs cannot be used to probe
+what exists.
 
-## ⚠️ Before you submit this — one thing needs your action
+**Run it locally** — Node 20.11+, no database server, no accounts, nothing to pay for:
 
-1. **Read [AI_WORKFLOW.md](./AI_WORKFLOW.md) and confirm it matches your account
-   of how this was built.** It describes a paired effort with Claude Code across
-   the code and the API layer, with the scoping, architecture and verification on
-   your side. Reviewers will ask about specifics in the interview, so make sure
-   every claim in it is one you can speak to.
+```bash
+npm install
+npm run setup     # creates ./data/ajaia.db, migrates, seeds the demo accounts
+npm run dev       # http://localhost:3000
+npm test          # 150 tests
+```
+
+Jump to: [what works and what does not](#status-what-works-what-does-not) ·
+[requirements checklist](#requirements-checklist) ·
+[architecture note](./ARCHITECTURE.md) · [AI workflow note](./AI_WORKFLOW.md)
 
 ---
 
@@ -157,12 +171,18 @@ re-seeding a database that already has data.
 
 ### With another 2–4 hours
 
-1. Playwright end-to-end test of the core journey — the biggest genuine gap.
-2. A document outline panel built from the headings.
-4. Share links with expiry, as the first step toward inviting new users.
+1. **A Playwright end-to-end test** of the core journey — sign in, create,
+   format, share, switch user, verify read-only. The server layer is covered
+   thoroughly and the React components not at all; this is the biggest genuine
+   gap.
+2. **A document outline panel** built from the document's headings, which is
+   what long documents start to need.
+3. **Share links with an expiry**, as the first step toward inviting people who
+   do not yet have an account.
 
-(Two earlier items on this list — a proper link-editing dialog and a live word
-count — have since been built.)
+(Three earlier items on this list have since been built: a proper link-editing
+dialog, a live word count, and verifying the Docker image — which is now what
+runs in production.)
 
 Reasoning for that order, and for what I would *not* start, is in
 [ARCHITECTURE.md](./ARCHITECTURE.md#what-i-would-do-next).
