@@ -1,6 +1,6 @@
 # Ajaia Docs
 
-**▶ Live: https://ai-symptom-analyzer-production.up.railway.app** — sign in with
+**▶ Live: https://ajaia-docs.up.railway.app** — sign in with
 one click as any of the three demo accounts.
 **🎥 Walkthrough: https://youtu.be/qyioRI18x8U** (4:47, captioned)
 
@@ -217,9 +217,10 @@ npm start
 ```
 
 A [`render.yaml`](./render.yaml) blueprint is included. Note that persistent
-disks are a **paid** feature on Render — on the free plan the app still runs and
-re-seeds on cold start, but user-created documents do not survive a restart. Read
-the comments in that file before deploying.
+disks are a **paid** feature on Render, so the blueprint is configured for the
+free plan: the app runs and re-seeds itself on cold start, but user-created
+documents do not survive a restart or an idle spin-down. The comments in that
+file explain the one-line change to a paid disk.
 
 ### Option B — Docker / Fly.io
 
@@ -236,10 +237,13 @@ fly secrets set SESSION_SECRET="$(openssl rand -base64 32)"
 fly deploy
 ```
 
-> **Honest caveat:** Docker was not installed on the machine this was built on, so
-> the container build is written from the standard multi-stage pattern but was
-> **not executed locally**. Option A is the path that was actually run and
-> verified end to end. If the image build fails, that is where to look first.
+> This is the path actually running in production — the live URL above is this
+> image, built remotely and served from a mounted volume. Deploying it fixed
+> three real container issues: a `VOLUME` declaration some platforms reject, a
+> mounted volume owned by root while the process runs as non-root (now handled
+> by a privilege-dropping entrypoint), and Next.js' standalone server binding to
+> `$HOSTNAME` — which Docker sets to the container ID — instead of all
+> interfaces.
 
 ### Do not deploy to Vercel as-is
 

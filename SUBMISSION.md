@@ -7,16 +7,13 @@
 
 ## 🔗 Live deployment
 
-**https://ai-symptom-analyzer-production.up.railway.app**
+**https://ajaia-docs.up.railway.app**
 
 Railway, Docker image, persistent volume at `/data`. The database migrates and
 seeds itself on first boot, so the three demo accounts below work immediately.
 Verified live: every rule in the permission matrix (viewer edit/delete → 403,
 editor re-share → 403, no-access → 404, unauthenticated → 401) plus round-trip
 persistence.
-
-> The hostname is inherited from an earlier project on the same free-tier
-> account — the app it serves is this one.
 
 ## 🎥 Walkthrough video
 
@@ -56,17 +53,19 @@ to end including a real concurrent-edit conflict and read-only enforcement.
 | **`ARCHITECTURE.md`** | What was prioritized and why, stack tradeoffs, deliberate cuts, weak points, what I would do next |
 | **`AI_WORKFLOW.md`** | Tools used, where AI helped, what I rejected, how correctness was verified |
 | **`SUBMISSION.md`** | This file |
-| **`docs/WALKTHROUGH_SCRIPT.md`** | Shot-by-shot script for the 3–5 minute video **[ACTION NEEDED]** |
-| **`VIDEO.txt`** | Video URL **[ACTION NEEDED — currently a placeholder]** |
+| **`docs/WALKTHROUGH_SCRIPT.md`** | Narration script for the walkthrough video |
+| **`docs/VIDEO_DESCRIPTION.md`** | Chapters and description for the published video |
+| **`VIDEO.txt`** | Walkthrough video URL |
 
 ### Deployment
 
 | File | Purpose |
 | --- | --- |
 | `.env.example` | Every environment variable, documented |
-| `render.yaml` | Render blueprint (plain Node service + persistent disk) |
-| `Dockerfile` | Multi-stage, non-root container build — **written but not executed locally; Docker was unavailable on the build machine** |
-| `fly.toml` | Fly.io config with a persistent volume |
+| `render.yaml` | Render blueprint, configured for the free tier |
+| `Dockerfile` | Multi-stage, non-root container build — **this is what runs in production on Railway** |
+| `fly.toml` | Fly.io config with a persistent volume (alternative host) |
+| `docs/DEPLOYMENT.md` | Step-by-step guide for Railway, Render and Fly |
 
 ---
 
@@ -107,12 +106,12 @@ and Delete/Share are absent.
 | Formatting preserved | ✅ | Stored as sanitized HTML |
 | Shared access demonstrable | ✅ | Three seeded accounts covering all three roles |
 | Setup and run instructions | ✅ | README |
-| Working deployment | ⚠️ | **[ACTION NEEDED]** — configs and verified commands provided; needs your account |
+| Working deployment | ✅ | Live on Railway; permission matrix re-verified against the public URL |
 | Validation and error handling | ✅ | Zod at every boundary; typed errors with human-readable messages |
 | At least one meaningful test | ✅ | 150 tests, weighted toward permissions, sanitization and persistence |
 | Architecture note | ✅ | `ARCHITECTURE.md` |
 | AI workflow note | ✅ | `AI_WORKFLOW.md` |
-| Walkthrough video | ⚠️ | **[ACTION NEEDED]** — script provided in `docs/` |
+| Walkthrough video | ✅ | 4:47, captioned — https://youtu.be/qyioRI18x8U |
 
 ### Stretch items completed
 
@@ -151,8 +150,6 @@ re-seeding a database that already has data.
   cannot be represented rather than dropping it silently.
 - **No email of any kind** — so no invites to non-existent accounts, and no
   password reset.
-- **The Docker build is unverified.** Written from the standard pattern but never
-  executed; Docker was not installed on the build machine.
 - **No component/browser tests.** The server layer is covered thoroughly; the
   React components are not.
 - **SQLite is single-writer** — this must not be scaled to multiple instances
@@ -161,9 +158,7 @@ re-seeding a database that already has data.
 ### With another 2–4 hours
 
 1. Playwright end-to-end test of the core journey — the biggest genuine gap.
-2. Build and fix the Docker image, so the least-trustworthy artifact becomes
-   trustworthy.
-3. A document outline panel built from the headings.
+2. A document outline panel built from the headings.
 4. Share links with expiry, as the first step toward inviting new users.
 
 (Two earlier items on this list — a proper link-editing dialog and a live word

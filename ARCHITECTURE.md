@@ -195,21 +195,48 @@ than the source of truth.
 
 ## What I would do next
 
-Two items from the original version of this list have since been done: the
-`window.prompt` link editor was replaced with a proper dialog, and a live word
-count / reading time was added to the editor. What remains, in the order I
-would do it:
+Three items from the original version of this list have since been done: the
+`window.prompt` link editor was replaced with a proper dialog, a live word
+count / reading time was added, and the Docker image — previously written but
+never executed — is now the artifact running in production on Railway.
+Deploying it surfaced three real container bugs, described below. What remains,
+in the order I would do it:
 
 1. **A Playwright end-to-end test** of the core journey — sign in, create,
    format, share, switch user, verify read-only. The current suite covers the
    server thoroughly and the React components not at all; this is the biggest
    real gap.
-2. **Verify and fix the Docker build.** It is written but was never executed
-   (Docker was not installed on the build machine), which makes it the least
-   trustworthy artifact in the repo.
-3. **A document outline panel** for long documents, built from the headings.
-4. **Per-document share links with an expiry**, as the first step toward inviting
+2. **A document outline panel** for long documents, built from the headings.
+3. **Per-document share links with an expiry**, as the first step toward inviting
    people who do not yet have accounts.
 
 I would not start real-time collaboration in that window. It is the most
 requested-sounding feature and the one most likely to end as a broken half-build.
+
+---
+
+## What deploying actually taught me
+
+The container image had passed review and looked correct. Running it in a real
+platform broke it three times, each for a reason no amount of reading would have
+surfaced:
+
+1. **`VOLUME ["/data"]` was rejected outright.** Railway refuses images that
+   declare a volume, because it manages mounts itself. The declaration was doing
+   nothing useful anyway — Fly mounts through `fly.toml`, Railway through its own
+   settings — so it came out.
+2. **The mounted volume arrives owned by `root`, but the process runs as
+   `node`.** The container started, printed `Ready`, and immediately died with
+   *unable to open database file*. Fixed with an entrypoint that starts as root,
+   `chown`s the database directory, then `exec`s the server through `gosu` as
+   `node` — the pattern the official Postgres and Redis images use. The runtime
+   process is still unprivileged.
+3. **Next.js' standalone server binds to `$HOSTNAME`, and Docker sets that to
+   the container ID.** So it listened on the container's own address and every
+   request through the platform router returned 502. Fixed by exporting
+   `HOSTNAME=0.0.0.0` in the entrypoint.
+
+None of these are exotic. All three are invisible until something actually
+schedules the image. That is the same lesson the AI note draws from a different
+direction: the bugs that survive review are the ones only running the thing can
+find.

@@ -2,7 +2,7 @@
 
 # Ajaia Docs — Full Stack Product Engineer take-home
 
-**Live app:** https://ai-symptom-analyzer-production.up.railway.app
+**Live app:** https://ajaia-docs.up.railway.app
 **Walkthrough video:** https://youtu.be/qyioRI18x8U
 **Google Drive folder:** [PASTE DRIVE FOLDER URL]
 
@@ -90,17 +90,16 @@ Real-time co-editing (CRDT + socket server) · comments/suggestions · images an
 - `/api/users` exposes every account to power share suggestions; correct for a 3-account demo, wrong for production.
 - Login rate limiting is in-process only.
 - Demo credentials are printed on the login page — deliberate for review, first thing to remove otherwise.
-- **The Docker build was written but never executed** (Docker was not installed on the build machine). The plain-Node path is the one actually verified.
+- Free-tier hosting: the machine suspends when idle, so the very first request after a quiet period can be slow.
 - No component/browser tests — the server layer is covered thoroughly, the React components are not.
 
 ## With another 2–4 hours
 
 1. A Playwright end-to-end test of the core journey — the biggest genuine gap.
-2. Build and fix the Docker image, so the least-trustworthy artifact becomes trustworthy.
-3. A document outline panel built from the headings.
-4. Share links with expiry, as a first step toward inviting people without accounts.
+2. A document outline panel built from the headings.
+3. Share links with expiry, as a first step toward inviting people without accounts.
 
-(Two earlier items on this list — a proper link-editing dialog and a live word count — have since been built.)
+(Three earlier items on this list — a proper link-editing dialog, a live word count, and verifying the Docker build — have since been done; the container is what runs in production.)
 
 I would **not** start real-time collaboration in that window — it is the most impressive-sounding feature and the one most likely to end as a broken half-build.
 

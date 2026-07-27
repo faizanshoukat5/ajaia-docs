@@ -87,11 +87,8 @@ fly deploy
 This uploads the source and builds the `Dockerfile` remotely. First build
 takes a few minutes.
 
-> **Known caveat (documented in the README):** the Dockerfile was written but
-> never executed locally, because Docker was not installed on the build
-> machine. If the remote build fails, `fly logs` shows why, and the Dockerfile
-> is the first place to look. The plain-Node path (Option B/C) avoids Docker
-> entirely.
+> The Dockerfile is proven — it is the image running in production on Railway.
+> If a remote build fails, `fly logs` shows why.
 
 ### 6. Verify
 

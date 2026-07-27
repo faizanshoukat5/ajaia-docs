@@ -8,7 +8,7 @@ Ajaia Docs — a lightweight collaborative document editor built as a full-stack
 
 Captions in the video explain each step as it happens.
 
-🔗 Live app: https://ai-symptom-analyzer-production.up.railway.app
+🔗 Live app: https://ajaia-docs.up.railway.app
 💻 Source: https://github.com/faizanshoukat5/ajaia-docs
 
 Sign in with one click as any demo account (password: password123)
