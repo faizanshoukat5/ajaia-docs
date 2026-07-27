@@ -24,11 +24,21 @@ services:
     name: ajaia-docs
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build
+    region: oregon
+    # `--include=dev` is required: Render sets NODE_ENV=production, which makes
+    # a plain `npm ci` skip devDependencies — and the build needs TypeScript,
+    # Tailwind and the PostCSS plugin, all of which live there.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
-    healthCheckPath: /login
     envVars:
+      # Node 22 LTS. package.json requires >= 20.11.
+      - key: NODE_VERSION
+        value: "22"
+      # HMAC key for session cookies; the server refuses to boot without it.
       - key: SESSION_SECRET
         generateValue: true
-      - key: NODE_VERSION
-        value: "24"
+      # Free instances are memory-constrained; keep the Next.js build inside it.
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=460
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
