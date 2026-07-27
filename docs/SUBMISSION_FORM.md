@@ -1,10 +1,9 @@
-
-
 # Ajaia Docs — Full Stack Product Engineer take-home
 
 **Live app:** https://ajaia-docs.up.railway.app
 **Mirror:** https://ajaia-docs-6rwn.onrender.com *(same build, free instance — re-seeds on restart)*
 **Walkthrough video:** https://youtu.be/qyioRI18x8U
+**Source:** https://github.com/faizanshoukat5/ajaia-docs
 **Google Drive folder:** [PASTE DRIVE FOLDER URL]
 
 **Stack:** Next.js 16 (App Router) · React 19 · TypeScript · TipTap 3 (ProseMirror) · SQLite + Drizzle · Tailwind 4 · Vitest
