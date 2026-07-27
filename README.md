@@ -3,6 +3,8 @@
 **▶ Live: https://ajaia-docs.up.railway.app** — sign in with
 one click as any of the three demo accounts.
 **🎥 Walkthrough: https://youtu.be/qyioRI18x8U** (4:47, captioned)
+*Mirror: https://ajaia-docs-6rwn.onrender.com — same build on a free instance
+with no disk, so it re-seeds on restart.*
 
 A lightweight collaborative document editor — rich-text editing, file import, and
 role-based sharing, built as a single Next.js application.

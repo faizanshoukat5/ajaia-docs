@@ -10,9 +10,18 @@
 | | |
 | --- | --- |
 | **Live app** | **https://ajaia-docs.up.railway.app** |
+| **Mirror** | https://ajaia-docs-6rwn.onrender.com (identical build; see the note below) |
 | **Walkthrough video** | **https://youtu.be/qyioRI18x8U** (4:47, captioned) |
 | **Source** | https://github.com/faizanshoukat5/ajaia-docs — also in this folder as `ajaia-docs-source.zip` |
 | **Sign in** | One-click buttons on the login page. Password for all three: `password123` |
+
+> **Which URL to use:** either works and both were verified end to end. The
+> Railway one is primary because it has a **persistent volume**, so documents
+> you create survive restarts. The Render mirror runs on a free instance with
+> no disk, so it re-seeds itself whenever it restarts or wakes from idle —
+> everything is testable, but a document created there may not outlive a
+> spin-down. That tradeoff, and why the primary was chosen, is in
+> [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md).
 
 **Test accounts** — seeded automatically, on the live app and locally:
 

@@ -3,6 +3,7 @@
 # Ajaia Docs — Full Stack Product Engineer take-home
 
 **Live app:** https://ajaia-docs.up.railway.app
+**Mirror:** https://ajaia-docs-6rwn.onrender.com *(same build, free instance — re-seeds on restart)*
 **Walkthrough video:** https://youtu.be/qyioRI18x8U
 **Google Drive folder:** [PASTE DRIVE FOLDER URL]
 
