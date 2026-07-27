@@ -4,7 +4,7 @@
 **Mirror:** https://ajaia-docs-6rwn.onrender.com *(same build, free instance — re-seeds on restart)*
 **Walkthrough video:** https://youtu.be/qyioRI18x8U
 **Source:** https://github.com/faizanshoukat5/ajaia-docs
-**Google Drive folder:** [PASTE DRIVE FOLDER URL]
+**Google Drive folder:** https://drive.google.com/drive/folders/1Ncg3lS-nWpA7Lw0WA0eWs-oXpQqyc2zR?usp=sharing
 
 **Stack:** Next.js 16 (App Router) · React 19 · TypeScript · TipTap 3 (ProseMirror) · SQLite + Drizzle · Tailwind 4 · Vitest
 
